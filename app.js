@@ -30,6 +30,7 @@ const products = [
 const rounds = 25;
 let votesCount = 0;
 let currentProducts = [];
+let previousProducts = [];
 
 function calculateClickPercentage(product) {
   if (product.timesShown === 0) {
@@ -39,10 +40,16 @@ function calculateClickPercentage(product) {
   }
 }
 
+function getRandomUniqueProducts(productList, count, previousList) {
+  const shuffledProducts = [...productList].filter(product => !previousList.includes(product));
+  const uniqueProducts = shuffledProducts.sort(() => 0.5 - Math.random()).slice(0, count);
+  return uniqueProducts;
+}
 // Function to display three random products
 function displayRandomProducts() {
   const container = document.getElementById('product-container');
-  currentProducts = getRandomProducts(products, 3);
+  previousProducts = currentProducts;
+  currentProducts = getRandomUniqueProducts(products, 3, previousProducts);
 
   container.innerHTML = '';
   currentProducts.forEach((product) => {
@@ -58,12 +65,6 @@ function displayRandomProducts() {
   });
 
   attachEventListeners();
-}
-
-// Function to generate random products
-function getRandomProducts(productList, count) {
-  const shuffledProducts = [...productList].sort(() => 0.5 - Math.random());
-  return shuffledProducts.slice(0, count);
 }
 
 // Function to attach event listeners to product images
