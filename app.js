@@ -43,8 +43,6 @@ function calculateClickPercentage(product) {
     product.clickPercentage = (product.timesClicked / product.timesShown) * 100;
   }
 }
-
-// Function to display three random products
 function displayRandomProducts() {
   const container = document.getElementById('product-container');
   previousProducts = currentProducts;
@@ -64,11 +62,6 @@ function displayRandomProducts() {
   });
 
   attachEventListeners();
-
-  const storedRemainingRounds = localStorage.getItem('remainingRounds');
-  if (storedRemainingRounds !== null) {
-    remainingRounds = parseInt(storedRemainingRounds, 10);
-  }
 
   const remainingRoundsElement = document.getElementById('remaining-rounds');
   remainingRoundsElement.textContent = `Remaining Votes: ${remainingRounds}`;
