@@ -8,6 +8,6 @@ This is an app to be able to vote between three products at random and view your
 
 ## Light House Accessibility Report Score
 
-As of July 24th, 2023
+As of July 26th, 2023
 
-![Alt text](<Screenshot 2023-07-24 at 4.10.13 PM.png>)
+![Alt text](<Screenshot 2023-07-26 at 11.25.25 AM.png>)

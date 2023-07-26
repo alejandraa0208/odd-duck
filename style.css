@@ -9,6 +9,12 @@ body {
     text-align: center;
     font-family:Georgia, 'Times New Roman', Times, serif ;
   }
+
+  h2 {
+    text-align: center;
+    font-size: medium;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+  }
   .container {
     display: flex;
     gap: 10px;
