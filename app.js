@@ -25,12 +25,14 @@ const products = [
   new Product('Tauntaun Sleeping Bag', 'img/tauntaun.jpg'),
   new Product('Unicorn Meat', 'img/unicorn.jpg'),
   new Product('Water Can', 'img/water-can.jpg'),
-  new Product('Wine Glass', 'img/wine-glass.jpg')];
-
+  new Product('Wine Glass', 'img/wine-glass.jpg')
+];
 
 const rounds = 25;
 let votesCount = 0;
 let currentProducts = [];
+let remainingRounds = rounds;
+let previousProducts = [];
 
 function calculateClickPercentage(product) {
   if (product.timesShown === 0) {
@@ -40,10 +42,9 @@ function calculateClickPercentage(product) {
   }
 }
 
-// Function to display three random products
 function displayRandomProducts() {
   const container = document.getElementById('product-container');
-  currentProducts = getRandomProducts(products, 3);
+  currentProducts = getRandomUniqueProducts(products, 3, previousProducts);
 
   container.innerHTML = '';
   currentProducts.forEach((product) => {
@@ -59,15 +60,31 @@ function displayRandomProducts() {
   });
 
   attachEventListeners();
+
+  const storedRemainingRounds = localStorage.getItem('remainingRounds');
+  if (storedRemainingRounds !== null) {
+    remainingRounds = parseInt(storedRemainingRounds, 10);
+  }
+
+  const remainingRoundsElement = document.getElementById('remaining-rounds');
+  remainingRoundsElement.textContent = `Remaining Votes: ${remainingRounds}`;
 }
 
-// Function to generate random products
-function getRandomProducts(productList, count) {
-  const shuffledProducts = [...productList].sort(() => 0.5 - Math.random());
-  return shuffledProducts.slice(0, count);
+function getRandomUniqueProducts(productList, count, previousProducts) {
+  const shuffledProducts = productList.filter(product => !previousProducts.includes(product));
+  const selectedProducts = shuffledProducts.slice(0, count);
+
+  // Save the current products for future checks
+  previousProducts.push(...selectedProducts);
+
+  // If we have displayed all products, reset the previousProducts array
+  if (previousProducts.length === productList.length) {
+    previousProducts = [];
+  }
+
+  return selectedProducts;
 }
 
-// Function to attach event listeners to product images
 function attachEventListeners() {
   const productDivs = document.getElementsByClassName('product');
   for (let i = 0; i < productDivs.length; i++) {
@@ -75,7 +92,6 @@ function attachEventListeners() {
   }
 }
 
-// Function to handle product clicks
 function handleProductClick(event) {
   votesCount++;
   const clickedProduct = event.target.alt;
@@ -91,13 +107,15 @@ function handleProductClick(event) {
 
   if (votesCount === rounds) {
     removeEventListeners();
-    showResults();
+    showAllResults();
   } else {
     displayRandomProducts();
   }
+  remainingRounds--;
+  localStorage.setItem('remainingRounds', remainingRounds);
+
 }
 
-// Function to remove event listeners from product images
 function removeEventListeners() {
   const productDivs = document.getElementsByClassName('product');
   for (let i = 0; i < productDivs.length; i++) {
@@ -105,8 +123,7 @@ function removeEventListeners() {
   }
 }
 
-// Function to show the voting results
-function showResults() {
+function showAllResults() {
   const resultsContainer = document.getElementById('results-container');
   const votesData = currentProducts.map((product) => ({
     label: product.name,
@@ -114,11 +131,11 @@ function showResults() {
     backgroundColor: getRandomColor(),
   }));
 
-  const ctx = document.getElementById('chart').getContext('2d');
+  const ctx = document.getElementById('results-chart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Votes'],
+      labels: currentProducts.map(product => product.name),
       datasets: votesData,
     },
     options: {
@@ -131,13 +148,13 @@ function showResults() {
   const viewResultsBtn = document.getElementById('view-results-btn');
   viewResultsBtn.disabled = false;
   viewResultsBtn.addEventListener('click', () => {
-    resultsContainer.removeChild(document.getElementById('chart'));
+    resultsContainer.removeChild(document.getElementById('results-chart-container'));
     viewResultsBtn.disabled = true;
     displayRandomProducts();
   });
 }
 
-// Function to generate random colors for chart
+
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -150,6 +167,7 @@ function getRandomColor() {
 function saveProductsFromLocalStorage() {
   localStorage.setItem('products', JSON.stringify(products));
 }
+
 if (localStorage.getItem('products')) {
   const storedProducts = JSON.parse(localStorage.getItem('products'));
   storedProducts.forEach((product) => {
@@ -161,6 +179,4 @@ if (localStorage.getItem('products')) {
   });
 }
 
-// Start the voting session
 displayRandomProducts();
-
