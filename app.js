@@ -27,6 +27,7 @@ const products = [
   new Product('Water Can', 'img/water-can.jpg'),
   new Product('Wine Glass', 'img/wine-glass.jpg')];
 
+
 const rounds = 25;
 let votesCount = 0;
 let currentProducts = [];
@@ -87,6 +88,7 @@ function handleProductClick(event) {
   currentProducts.forEach((product) => {
     calculateClickPercentage(product);
   });
+  saveProductsFromLocalStorage();
 
   if (votesCount === rounds) {
     removeEventListeners();
@@ -144,6 +146,20 @@ function getRandomColor() {
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
+}
+
+function saveProductsFromLocalStorage() {
+  localStorage.setItem('products', JSON.stringify(products));
+}
+if (localStorage.getItem('products')) {
+  const storedProducts = JSON.parse(localStorage.getItem('products'));
+  storedProducts.forEach((product) => {
+    const newProduct = new Product(product.name, product.imagePath);
+    newProduct.timesShown = product.timesShown;
+    newProduct.timesClicked = product.timesClicked;
+    newProduct.clickPercentage = product.clickPercentage;
+    products.push(newProduct);
+  });
 }
 
 // Start the voting session
