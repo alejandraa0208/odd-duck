@@ -91,6 +91,11 @@ function attachEventListeners() {
   }
 }
 
+// Function to save products to local storage
+function saveProductsToLocalStorage() {
+  localStorage.setItem('products', JSON.stringify(products));
+}
+
 // Function to handle product clicks
 function handleProductClick(event) {
   votesCount++;
@@ -103,18 +108,27 @@ function handleProductClick(event) {
   currentProducts.forEach((product) => {
     calculateClickPercentage(product);
   });
-  saveProductsFromLocalStorage();
+  saveProductsToLocalStorage();
 
   if (votesCount === rounds) {
     removeEventListeners();
     showAllResults();
   } else {
     displayRandomProducts();
+    remainingRounds--;
+    if (remainingRounds < 0) {
+      remainingRounds = 0;
+    }
+    localStorage.setItem('remainingRounds', remainingRounds);
   }
-  remainingRounds--;
-  localStorage.setItem('remainingRounds', remainingRounds);
 }
 
+window.addEventListener('load', () => {
+  if (localStorage.getItem('remainingRounds')) {
+    remainingRounds = parseInt(localStorage.getItem('remainingRounds'));
+  }
+  displayRandomProducts();
+});
 // Function to remove event listeners from product images
 function removeEventListeners() {
   const productDivs = document.getElementsByClassName('product');
@@ -126,17 +140,23 @@ function removeEventListeners() {
 // Function to show the voting results
 function showAllResults() {
   const resultsContainer = document.getElementById('results-container');
-  const votesData = currentProducts.map((product) => ({
-    label: product.name,
-    data: [product.timesClicked],
-    backgroundColor: getRandomColor(),
-  }));
-
+  }
+  const voteData = {
+    labels: products.map(product => product.name),
+    datasets: [
+      {
+        label: 'Votes',
+        data: products.map(product => product.timesClicked),
+        backgroundColor: products.map(getRandomColor),
+      },
+    ],
+  };
+  
   const ctx = document.getElementById('results-chart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: currentProducts.map(product => product.name),
+      labels: products.map(product => product.name),
       datasets: votesData,
     },
     options: {
@@ -153,7 +173,7 @@ function showAllResults() {
     viewResultsBtn.disabled = true;
     displayRandomProducts();
   });
-}
+};
 
 // Function to generate random colors for chart
 function getRandomColor() {
@@ -165,23 +185,19 @@ function getRandomColor() {
   return color;
 }
 
-// Function to save products to local storage
-function saveProductsFromLocalStorage() {
-  localStorage.setItem('products', JSON.stringify(products));
-}
-
 // When the page loads, retrieve stored products from local storage (if any)
-if (localStorage.getItem('products')) {
-  const storedProducts = JSON.parse(localStorage.getItem('products'));
-  storedProducts.forEach((product) => {
-    const newProduct = new Product(product.name, product.imagePath);
-    newProduct.timesShown = product.timesShown;
-    newProduct.timesClicked = product.timesClicked;
-    newProduct.clickPercentage = product.clickPercentage;
-    products.push(newProduct);
-  });
-}
+window.addEventListener('load', () => {
+  if (localStorage.getItem('products')) {
+    const storedProducts = JSON.parse(localStorage.getItem('products'));
+    storedProducts.forEach((product) => {
+      const newProduct = new Product(product.name, product.imagePath);
+      newProduct.timesShown = product.timesShown;
+      newProduct.timesClicked = product.timesClicked;
+      newProduct.clickPercentage = product.clickPercentage;
+      products.push(newProduct);
+    });
+  }
 
-// Start the voting session
-displayRandomProducts();
-
+  // Start the voting session
+  displayRandomProducts();
+});
