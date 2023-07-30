@@ -5,24 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odd Duck Product Voting</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Vote For Our Next Product!</h1>
     <h2>Please Choose A Product</h2>
-    <div class="container">
-        <div id="results-container">
-            <h2>Results:</h2>
-            <div id="chart-container">
-                <canvas id="results-chart"></canvas>
-                <button id="view-results-btn" disabled>View Results</button>
-            </div>
-        </div>
-        <div id="product-container">
-            <!-- Products added via JavaScript -->
-        </div>
-        <p id="remaining-rounds"></p>
+    <div id="product-container"></div>
+    <p id="remaining-rounds"></p>
+    <div id="results-container">
+      <canvas id="results-chart" width="400" height="200"></canvas>
+      <button id="view-results-btn" disabled>View Results</button>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
